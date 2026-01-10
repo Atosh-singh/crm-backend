@@ -1,34 +1,36 @@
+const bcrypt = require("bcryptjs");
 const { User } = require("../../../models/User");
 const { Role } = require("../../../models/Role");
 
 const createUser = async (req, res) => {
   try {
-    const { name, email, phone, password, roleId } = req.body;
+    const { name, username, email, phone, password, roleId } = req.body;
 
-    if (!name || !email || !password || !roleId) {
+    if (!name || !username || !email || !password || !roleId) {
       return res.status(400).json({
-        message: "name, email, password, roleId are required",
+        message: "name, username, email, password, roleId are required",
       });
     }
 
-    // ✅ check duplicate email
-    const userExist = await User.findOne({ email: email.toLowerCase() });
-    if (userExist) {
-      return res.status(409).json({ message: "User already exists" });
-    }
+    const emailExist = await User.findOne({ email: email.toLowerCase() });
+    if (emailExist) return res.status(409).json({ message: "Email already exists" });
 
-    // ✅ validate role
+    const usernameExist = await User.findOne({ username: username.toLowerCase() });
+    if (usernameExist) return res.status(409).json({ message: "Username already exists" });
+
     const role = await Role.findById(roleId);
-    if (!role) {
-      return res.status(400).json({ message: "Invalid roleId" });
-    }
+    if (!role) return res.status(400).json({ message: "Invalid roleId" });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await User.create({
       name,
+      username: username.toLowerCase(),
       email: email.toLowerCase(),
       phone,
-      password, // ✅ hashing later (auth module)
+      password: hashedPassword,
       role: roleId,
+      authProvider: "local",
     });
 
     return res.status(201).json({

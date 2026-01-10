@@ -1,32 +1,16 @@
 const { User } = require("../../../models/User");
 
-const deleteUser = async (req , res )  =>{
-    try{
+const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-const {id} = req.params;
+    await User.findByIdAndDelete(req.params.id);
 
-const user = await User.findOne({_id:id, removed: false});
+    res.status(200).json({ message: "✅ User deleted permanently" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
-if(!user){
-    return res.status(404).json({
-        message:"User Not found"
-    })
-}
-
-user.removed= true;
-user.enabled = false;
-await user.save();
-
-return res.status(200).json({
-      message: "✅ User deleted successfully (soft delete)",
-    });
-
-    } catch(error){
-        return res.status(500).json({
-            message: error.message
-        })
-    }
-}
-
-
-module.exports = {deleteUser}
+module.exports = {deleteUser};

@@ -2,21 +2,14 @@ const { User } = require("../../../models/User");
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = (
-      await User.find({ removed: false }).populate(
-        "role",
-        "name permissions isActive"
-      )
-    ).toSorted({ createdAt: -1 });
+    const users = await User.find()
+      .populate("role", "name permissions isActive")
+      .sort({ createdAt: -1 });
 
-    return res.json({
-      message: "✅ Users fetched successfully",
-      total: users.length,
-      data: users,
-    });
+    res.status(200).json({ message: "✅ Users fetched", data: users });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { getAllUsers };
+module.exports = {getAllUsers};

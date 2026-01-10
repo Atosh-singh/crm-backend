@@ -2,20 +2,16 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    removed: {
-      type: Boolean,
-      default: false,
-    },
-    enabled: {
-      type: Boolean,
-      default: true,
-    },
+    enabled: { type: Boolean, default: true },
 
-    name: {
+    name: { type: String, required: true, trim: true, minlength: 2 },
+
+    username: {
       type: String,
       required: true,
+      unique: true,
       trim: true,
-      minlength: 2,
+      lowercase: true,
     },
 
     email: {
@@ -26,45 +22,31 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
     },
 
-    phone: {
-      type: String,
-      trim: true,
-      default: "",
-    },
+    phone: { type: String, trim: true, default: "" },
 
     password: {
       type: String,
-      required: true,
       minlength: 6,
       select: false,
+      default: null, // ✅ local login me controller set karega
     },
 
-    role: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Role",
-      required: true,
-    },
+    role: { type: mongoose.Schema.Types.ObjectId, ref: "Role", required: true },
 
-    status: {
+    status: { type: String, enum: ["active", "inactive"], default: "active" },
+
+    lastLogin: { type: Date, default: null },
+
+    authProvider: {
       type: String,
-      enum: ["active", "inactive"],
-      default: "active",
+      enum: ["local", "google"],
+      default: "local",
     },
 
-    lastLogin: {
-      type: Date,
-      default: null,
-    },
+    googleId: { type: String, default: null },
   },
   { timestamps: true }
 );
 
-
-userSchema.pre(/^find/, function (next) {
-  this.where({ removed: false });
-  next();
-});
-
 const User = mongoose.model("User", userSchema);
-
 module.exports = { User };

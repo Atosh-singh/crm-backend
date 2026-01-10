@@ -7,7 +7,7 @@ const roleSchema = new mongoose.Schema(
       required: true,
       unique: true,
       trim: true,
-      lowercase: true, // future roles add karne me easy
+      lowercase: true,
     },
 
     permissions: {

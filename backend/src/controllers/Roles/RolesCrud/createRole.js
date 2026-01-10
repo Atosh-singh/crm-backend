@@ -1,36 +1,23 @@
-const {Role} = require('../../../models/Role');
+const { Role } = require("../../../models/Role");
 
-const createRole = async(req, res) =>{
-try{
-    const {name, permissions, isActive} = require.body;
+const createRole = async (req, res) => {
+  try {
+    const { name, permissions } = req.body;
 
-    if(!name){
-        return res.status(400).json({
-            message:"Role name is required!"
-        })
-    }
+    if (!name) return res.status(400).json({ message: "Role name required" });
 
-    const roleExist = await Role.findOne({name: name.toLowerCase()});
-    if(roleExist) {
-        return res.status(400). json({
-            message:"Role already exists"
-        })
-    }
+    const exist = await Role.findOne({ name: name.toLowerCase().trim() });
+    if (exist) return res.status(409).json({ message: "Role already exists" });
 
-    const newRole = await Role.create({
-        name:name.toLowerCase(),
-        permissions:permissions || [],
-        isActive:isActive?? true,
+    const role = await Role.create({
+      name: name.toLowerCase().trim(),
+      permissions: Array.isArray(permissions) ? permissions : [],
     });
 
-    return res.status(201).json({
-   message: "✅ Role created successfully",
-   data: newRole,
-    })
+    res.status(201).json({ message: "✅ Role created", data: role });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
-}catch(error){
-    return res.status(500).json({message: error.message});
-}
-}
-
-module.exports = {createRole}
+module.exports = {createRole};

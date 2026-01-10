@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
+const { authenticate,authorize } = require("../middlewares");
+
 const {
   createUser,
   getAllUsers,
@@ -9,10 +11,15 @@ const {
   deleteUser,
 } = require("../controllers/User/UserCrud");
 
+// ✅ User CRUD (permission based)
+router.post("/", authenticate, authorize("user:create"), createUser);
 
+router.get("/", authenticate, authorize("user:read"), getAllUsers);
 
-router.post("/", createUser);
-router.get("/", getAllUsers);
-router.get("/:id", getSingleUser);
-router.patch("/:id", updateUser);
-router.delete("/:id", deleteUser);
+router.get("/:id", authenticate, authorize("user:read"), getSingleUser);
+
+router.put("/:id", authenticate, authorize("user:update"), updateUser);
+
+router.delete("/:id", authenticate, authorize("user:delete"), deleteUser);
+
+module.exports = router;
