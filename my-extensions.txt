@@ -1,0 +1,13 @@
+austenc.tailwind-docs
+bradlc.vscode-tailwindcss
+christian-kohler.npm-intellisense
+christian-kohler.path-intellisense
+dbaeumer.vscode-eslint
+esbenp.prettier-vscode
+formulahendry.auto-close-tag
+formulahendry.auto-rename-tag
+pkief.material-icon-theme
+postman.postman-for-vscode
+rangav.vscode-thunder-client
+ritwickdey.liveserver
+rodrigovallades.es7-react-js-snippets

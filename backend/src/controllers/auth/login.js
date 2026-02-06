@@ -1,6 +1,11 @@
 const bcrypt = require("bcryptjs");
 const { User } = require("../../models/User");
-const { generateToken } = require("../../utils/Token/generateToken");
+const generateToken = require("../../utils/Token/generateToken"); // ✅ Fix import
+
+
+// ✅ add this right here
+console.log("generateToken:", generateToken);
+console.log("typeof generateToken:", typeof generateToken);
 
 const login = async (req, res) => {
   try {
@@ -22,11 +27,9 @@ const login = async (req, res) => {
       .select("+password")
       .populate("role", "name permissions isActive");
 
-    if (!user) {
-      return res.status(401).json({ message: "Invalid login credentials" });
-    }
+    if (!user) return res.status(401).json({ message: "Invalid login credentials" });
 
-    if (!user.enabled) {
+    if (user.enabled === false) {
       return res.status(403).json({ message: "User disabled by admin" });
     }
 
@@ -34,23 +37,21 @@ const login = async (req, res) => {
       return res.status(403).json({ message: "User is inactive" });
     }
 
-    if (user.authProvider !== "local") {
+    if (user.authProvider && user.authProvider !== "local") {
       return res.status(400).json({
         message: `This account is registered using ${user.authProvider}. Please login with ${user.authProvider}.`,
       });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid login credentials" });
-    }
+    if (!isMatch) return res.status(401).json({ message: "Invalid login credentials" });
 
     user.lastLogin = new Date();
     await user.save();
 
     return res.status(200).json({
       message: "✅ Login successful",
-      token: generateToken(user._id),
+      token: generateToken(user._id.toString()),
       user: {
         id: user._id,
         name: user.name,

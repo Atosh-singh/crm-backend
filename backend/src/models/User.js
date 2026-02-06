@@ -2,7 +2,14 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    enabled: { type: Boolean, default: true },
+     removed: {
+      type: Boolean,
+      default: false,
+    },
+    enabled: {
+      type: Boolean,
+      default: true,
+    },
 
     name: { type: String, required: true, trim: true, minlength: 2 },
 

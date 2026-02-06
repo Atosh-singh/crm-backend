@@ -1,18 +1,25 @@
-const express = require('express');
+const express = require("express");
+const cors = require("cors");
 
 const app = express();
 
-// global middlewares
+// ✅ CORS allow frontend
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+
+
 app.use(express.json());
 
+const routes = require("./routes");
+app.use("/api/v1", routes);
 
-const routes= require("./routes");
+app.get("/", (req, res) => res.send("Server Running ✅"));
 
-app.use("/api/v1", routes)
-// test route
-app.get('/', (req,res) =>{
-    res.send("Server running")
-});
-
-
-module.exports= app;
+module.exports = app;
