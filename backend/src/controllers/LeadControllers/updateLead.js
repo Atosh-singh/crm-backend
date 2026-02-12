@@ -1,41 +1,33 @@
+const mongoose = require("mongoose");
 const { Lead } = require("../../models/Lead");
 
 const updateLead = async (req, res) => {
   try {
     const { id } = req.params;
-    const { phone, name } = req.body;
 
-    let filter = {};
-
-    // 🔹 Priority 1: Update by ID
-    if (id) {
-      filter._id = id;
-    }
-    // 🔹 Priority 2: Update by phone
-    else if (phone) {
-      filter.phone = phone;
-    }
- 
-    else {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
-        message: "ID or phone or name is required to update lead",
+        message: "Invalid Lead ID",
       });
     }
 
-    const lead = await Lead.findOneAndUpdate(
-      filter,
+    const lead = await Lead.findByIdAndUpdate(
+      id,
       req.body,
       { new: true }
     );
 
     if (!lead) {
-      return res.status(404).json({ message: "Lead not found" });
+      return res.status(404).json({
+        message: "Lead not found",
+      });
     }
 
     res.status(200).json({
       message: "✅ Lead updated",
       data: lead,
     });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

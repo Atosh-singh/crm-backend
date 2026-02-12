@@ -7,6 +7,7 @@ const sourceSchema = new mongoose.Schema(
       required: true,
       trim: true,
       unique: true,
+      lowercase: true,
     },
 
     enabled: {
